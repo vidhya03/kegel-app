@@ -12,6 +12,7 @@ import BottomNav from './components/BottomNav'
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('home')
   const [completedSession, setCompletedSession] = useState(null)
+  const [sessionExercises, setSessionExercises] = useState(null)
 
   const progressManager = useProgress()
   const progress = progressManager.getProgress()
@@ -23,7 +24,8 @@ export default function App() {
   const allTimeStats = progressManager.getAllTimeStats()
   const weekSessions = progressManager.getWeekSessions()
 
-  const handleStart = useCallback(() => {
+  const handleStart = useCallback((exercises) => {
+    setSessionExercises(exercises)
     setCurrentScreen('session')
   }, [])
 
@@ -65,8 +67,8 @@ export default function App() {
   const showNav = currentScreen !== 'session'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {currentScreen === 'home' && (
           <HomeScreen
             onStart={handleStart}
@@ -81,6 +83,7 @@ export default function App() {
             onStop={handleStop}
             settings={settings}
             progress={progress}
+            exercises={sessionExercises}
           />
         )}
         {currentScreen === 'complete' && (

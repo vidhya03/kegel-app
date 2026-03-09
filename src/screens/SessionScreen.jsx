@@ -7,7 +7,8 @@ import { useVibration } from '../hooks/useVibration'
 import { PROGRAM } from '../data/program'
 
 // SessionScreen — real-time timer with squeeze/release phases
-export default function SessionScreen({ onComplete, onStop, settings, progress }) {
+// exercises prop: specific selection from HomeScreen, falls back to full week program
+export default function SessionScreen({ onComplete, onStop, settings, progress, exercises: exercisesProp }) {
   const startTimeRef = useRef(Date.now())
   const [paused, setPaused] = useState(false)
   const [totalReps, setTotalReps] = useState(0)
@@ -17,7 +18,7 @@ export default function SessionScreen({ onComplete, onStop, settings, progress }
 
   const weekKey = `week${progress.week}`
   const dayData = PROGRAM[weekKey]?.days?.[progress.day - 1]
-  const exercises = dayData?.exercises || []
+  const exercises = exercisesProp || dayData?.exercises || []
 
   const handlePhaseChange = (phase) => {
     if (phase === 'squeeze') {

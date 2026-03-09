@@ -13,20 +13,41 @@ function DifficultyDots({ level }) {
   return (
     <span style={{ display: 'inline-flex', gap: '3px', verticalAlign: 'middle' }}>
       {[1, 2, 3, 4].map(i => (
-        <span
-          key={i}
-          style={{
-            width: 6, height: 6, borderRadius: '50%',
-            background: i <= level ? 'currentColor' : 'var(--cds-border-subtle-01)',
-            display: 'inline-block'
-          }}
-        />
+        <span key={i} style={{
+          width: 6, height: 6, borderRadius: '50%',
+          background: i <= level ? 'currentColor' : 'var(--cds-border-subtle-01)',
+          display: 'inline-block'
+        }} />
       ))}
     </span>
   )
 }
 
-// HomeScreen — shows today's workout, week selector, stats, and start button
+// Play button — solid IBM Blue, triangle icon
+function PlayBtn({ onClick, label }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      style={{
+        flexShrink: 0,
+        width: 40, height: 40,
+        background: '#0f62fe',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fff'
+      }}
+    >
+      {/* Triangle play icon */}
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M3 2l11 6-11 6z"/>
+      </svg>
+    </button>
+  )
+}
+
+// HomeScreen — week selector + exercise rows with inline play buttons + stats
 export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions }) {
   const week = progress.week
   const day = progress.day
@@ -48,7 +69,6 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
     return all.filter(s => s.week === week).length
   }, [progress.sessions, week])
 
-  const duration = estimateDuration(exercises)
   const alreadyDoneTarget = doneToday >= sessionsPerDay
   const activeWeekMeta = WEEKS.find(w => w.week === week)
 
@@ -61,13 +81,8 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
       </div>
 
       {/* Week selector — tab strip */}
-      <div style={{
-        background: 'var(--cds-layer-01)',
-        border: '1px solid var(--cds-border-subtle-01)',
-        marginBottom: '1rem'
-      }}>
-        {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--cds-border-subtle-01)' }}>
+      <div style={{ background: 'var(--cds-layer-01)', border: '1px solid var(--cds-border-subtle-01)', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex' }}>
           {WEEKS.map(w => {
             const isActive = week === w.week
             return (
@@ -76,16 +91,15 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
                 onClick={() => onSetWeek(w.week)}
                 style={{
                   flex: 1,
-                  padding: '0.75rem 0',
-                  background: 'none',
+                  padding: '0.75rem 0.25rem',
+                  background: isActive ? '#0f62fe22' : 'transparent',
                   border: 'none',
-                  borderBottom: isActive ? '3px solid var(--cds-interactive)' : '3px solid transparent',
-                  marginBottom: -1,
-                  color: isActive ? 'var(--cds-interactive)' : 'var(--cds-text-secondary)',
+                  borderBottom: `3px solid ${isActive ? '#0f62fe' : '#393939'}`,
+                  color: isActive ? '#0f62fe' : 'var(--cds-text-secondary)',
                   fontWeight: isActive ? 700 : 400,
                   fontSize: '0.8125rem',
                   cursor: 'pointer',
-                  transition: 'color 0.15s, border-color 0.15s',
+                  transition: 'color 0.15s, border-color 0.15s, background 0.15s',
                   whiteSpace: 'nowrap'
                 }}
               >
@@ -95,8 +109,8 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
           })}
         </div>
 
-        {/* Active week info panel — fixed height, no layout shift */}
-        <div style={{ padding: '0.75rem 1rem', minHeight: '4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Week info */}
+        <div style={{ padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--cds-text-primary)', marginBottom: '0.2rem' }}>
               {activeWeekMeta?.name}
@@ -107,51 +121,74 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
           </div>
           <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: '1rem' }}>
             <div style={{ fontSize: '0.6875rem', color: 'var(--cds-text-secondary)', marginBottom: '0.25rem' }}>Difficulty</div>
-            <div style={{ color: 'var(--cds-interactive)' }}>
+            <div style={{ color: '#0f62fe' }}>
               <DifficultyDots level={activeWeekMeta?.difficulty} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Exercise list — scrollable, fixed max-height to prevent layout shift */}
+      {/* Exercise rows with inline play buttons */}
       <div style={{ marginBottom: '1.25rem' }}>
         <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem' }}>
-          Exercises · {exercises.length} · ~{duration} min
+          Choose Exercise
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+
+          {/* Full session row */}
+          <div style={{
+            background: 'var(--cds-layer-01)',
+            border: '1px solid var(--cds-border-subtle-01)',
+            display: 'flex', alignItems: 'center'
+          }}>
+            <div style={{ flex: 1, padding: '0.75rem 1rem' }}>
+              <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--cds-text-primary)', marginBottom: '0.15rem' }}>
+                Full Session
+              </div>
+              <div style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)' }}>
+                All {exercises.length} exercise{exercises.length !== 1 ? 's' : ''} · ~{estimateDuration(exercises)} min
+              </div>
+            </div>
+            <PlayBtn onClick={() => onStart(exercises)} label="Start full session" />
+          </div>
+
+          {/* Individual exercise rows */}
           {exercises.map((ex, i) => (
-            <div key={ex.id} style={{
-              background: 'var(--cds-layer-01)',
-              border: '1px solid var(--cds-border-subtle-01)',
-              padding: '0.875rem 1rem',
-              display: 'flex',
-              gap: '0.75rem',
-              alignItems: 'flex-start'
-            }}>
-              {/* Exercise number badge */}
+            <div
+              key={ex.id}
+              style={{
+                background: 'var(--cds-layer-01)',
+                border: '1px solid var(--cds-border-subtle-01)',
+                display: 'flex', alignItems: 'center'
+              }}
+            >
+              {/* Number badge */}
               <div style={{
-                width: 24, height: 24, flexShrink: 0,
-                background: 'var(--cds-interactive)',
-                color: '#fff',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                width: 32, alignSelf: 'stretch', flexShrink: 0,
+                background: 'var(--cds-layer-02)',
+                borderRight: '1px solid var(--cds-border-subtle-01)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.75rem', fontWeight: 700, color: 'var(--cds-text-secondary)'
               }}>
                 {i + 1}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--cds-text-primary)', marginBottom: '0.25rem' }}>
+
+              {/* Exercise info */}
+              <div style={{ flex: 1, padding: '0.75rem 0.875rem' }}>
+                <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--cds-text-primary)', marginBottom: '0.15rem' }}>
                   {ex.name}
                 </div>
-                <div style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)', marginBottom: '0.25rem' }}>
-                  {ex.holdSeconds}s hold · {ex.restSeconds}s rest · {ex.reps} reps · {ex.sets} sets
+                <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginBottom: '0.15rem' }}>
+                  {ex.holdSeconds}s hold · {ex.restSeconds}s rest · {ex.reps} reps · {ex.sets} sets · ~{estimateDuration([ex])} min
                 </div>
-                <div style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)', fontStyle: 'italic' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', fontStyle: 'italic' }}>
                   {ex.description}
                 </div>
               </div>
+
+              {/* Inline play button */}
+              <PlayBtn onClick={() => onStart([ex])} label={`Start ${ex.name}`} />
             </div>
           ))}
         </div>
@@ -171,21 +208,11 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
           background: 'var(--cds-layer-01)',
           border: '1px solid var(--cds-support-success)',
           color: 'var(--cds-support-success)',
-          fontSize: '0.875rem',
-          marginBottom: '0.75rem'
+          fontSize: '0.875rem'
         }}>
           Well done! Target sessions complete today ({doneToday}/{sessionsPerDay})
         </div>
       )}
-
-      {/* Start button */}
-      <button
-        className="cds--btn cds--btn--primary"
-        style={{ width: '100%', maxWidth: '100%', justifyContent: 'center', fontSize: '1rem', padding: '1rem' }}
-        onClick={onStart}
-      >
-        {alreadyDoneTarget ? 'Do Another Session' : 'Start Session'}
-      </button>
     </div>
   )
 }
