@@ -70,6 +70,7 @@ export default function App() {
         {currentScreen === 'home' && (
           <HomeScreen
             onStart={handleStart}
+            onSetWeek={progressManager.setWeek}
             progress={progress}
             todaySessions={todaySessions}
           />

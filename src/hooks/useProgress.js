@@ -113,6 +113,13 @@ export function useProgress() {
     refresh()
   }, [refresh])
 
+  // Manually set the active week (1–4) — resets day to 1
+  const setWeek = useCallback((week) => {
+    writeJSON(KEYS.week, Math.min(Math.max(week, 1), 4))
+    writeJSON(KEYS.day, 1)
+    refresh()
+  }, [refresh])
+
   const resetProgress = useCallback(() => {
     Object.values(KEYS).forEach(k => localStorage.removeItem(k))
     refresh()
@@ -172,6 +179,7 @@ export function useProgress() {
     saveSession,
     getSettings,
     saveSettings,
+    setWeek,
     resetProgress,
     getTodaySessions,
     getWeekSessions,
