@@ -20,12 +20,37 @@ export default function SessionScreen({ onComplete, onStop, settings, progress, 
   const dayData = PROGRAM[weekKey]?.days?.[progress.day - 1]
   const exercises = exercisesProp || dayData?.exercises || []
 
+  // On mount: start keep-alive audio + pre-schedule ALL tones for the full session.
+  // Pre-scheduling uses AudioContext's native clock which runs even when iOS is locked.
+  // Voice mode can't be pre-scheduled, so it falls back to handlePhaseChange.
+  useEffect(() => {
+    const init = async () => {
+      await sound.startKeepAlive()
+      sound.scheduleAllSounds(exercises)
+    }
+    init()
+
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Kegel Session',
+        artist: 'KegelCoach',
+      })
+      navigator.mediaSession.playbackState = 'playing'
+    }
+
+    return () => {
+      sound.stopKeepAlive() // also cancels scheduled sounds
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handlePhaseChange = (phase) => {
     if (phase === 'squeeze') {
-      sound.playSqueezeSound()
+      // Tones are pre-scheduled — only play here for voice mode to avoid double-play
+      if (settings.soundType === 'voice') sound.playSqueezeSound()
       vibration.vibrateOnSqueeze()
     } else if (phase === 'release') {
-      sound.playReleaseSound()
+      if (settings.soundType === 'voice') sound.playReleaseSound()
       vibration.vibrateOnRelease()
       setTotalReps(r => r + 1)
     }
@@ -73,11 +98,14 @@ export default function SessionScreen({ onComplete, onStop, settings, progress, 
 
   const handlePause = () => {
     timer.pause()
+    sound.cancelScheduledSounds()
     setPaused(true)
   }
 
   const handleResume = () => {
     timer.resume()
+    // Re-schedule remaining sounds from current position when resuming
+    sound.scheduleAllSounds(exercises.slice(timer.currentExerciseIndex))
     setPaused(false)
   }
 

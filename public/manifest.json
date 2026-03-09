@@ -1,7 +1,7 @@
 {
   "name": "KegelCoach",
   "short_name": "KegelCoach",
-  "description": "Personal pelvic floor trainer",
+  "description": "Free structured pelvic floor trainer — 4-week program with real-time timer and progress tracking",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#161616",
