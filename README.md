@@ -1,6 +1,6 @@
 # KegelCoach
 
-A personal pelvic floor trainer PWA for men. Guides users through a structured 4-week Kegel exercise program with real-time timer guidance, sound cues, and vibration feedback.
+A free, structured pelvic floor trainer PWA. Guides you through a 4-week Kegel exercise program with real-time timer guidance, sound cues, and vibration feedback.
 
 **Live:** [kegel.labkit.in](https://kegel.labkit.in)
 
