@@ -63,12 +63,13 @@ export default function FeedbackScreen() {
       ) : (
         <form
           name="feedback"
-          netlify
-          netlify-honeypot="bot-field"
+          data-netlify="true"
+          data-netlify-honeypot="bot-field"
           onSubmit={handleSubmit}
           style={{ marginBottom: '1.5rem' }}
         >
           {/* Honeypot — hidden from real users, catches bots */}
+          <input type="hidden" name="form-name" value="feedback" />
           <p style={{ display: 'none' }}>
             <label>Don't fill this out: <input name="bot-field" /></label>
           </p>

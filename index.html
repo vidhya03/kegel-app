@@ -12,9 +12,11 @@
   <body>
     <div id="root"></div>
     <!-- Hidden form for Netlify Forms detection at build time -->
-    <form name="feedback" netlify netlify-honeypot="bot-field" hidden>
+    <form name="feedback" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="bot-field" />
       <input type="text" name="name" />
       <input type="email" name="email" />
+      <select name="role"><option value="user">User</option></select>
       <textarea name="message"></textarea>
     </form>
     <script type="module" src="/src/main.jsx"></script>
