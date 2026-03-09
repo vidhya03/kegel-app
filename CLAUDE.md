@@ -16,21 +16,23 @@ Guides users through a structured 4-week Kegel exercise program with:
 - Session progress saved to localStorage
 - IBM Carbon Dark design system
 
-**Stack:** React + Vite (no UI libraries, pure CSS)
+**Stack:** React + Vite + `@carbon/styles` (selective SCSS imports) + `sass`
 **Platform:** Mobile-first PWA (installable on phone)
 
 ---
 
 ## 🎨 Design Rules — NEVER BREAK THESE
 
-- Theme: **IBM Carbon Dark** only
-- Font: **IBM Plex Sans** (body) + **IBM Plex Mono** (timer)
+- Theme: **IBM Carbon Dark** (`g100` theme token) only
+- Font: **IBM Plex Sans** (body) + **IBM Plex Mono** (timer) — loaded via `@carbon/styles`
 - **Zero border radius** — sharp corners everywhere
-- **No external UI libraries** — no MUI, Ant Design, Carbon React
-- Squeeze state color: `#0f62fe` (IBM Blue)
-- Release state color: `#42be65` (IBM Green)
-- Background: `#161616` | Surface: `#262626` | Border: `#393939`
-- Text: `#f4f4f4` primary | `#c6c6c6` secondary
+- **No other UI libraries** — no MUI, Ant Design, Carbon React components
+- Use **official Carbon SCSS tokens** via `@carbon/styles` — never hardcode hex values
+- Squeeze state color: `$interactive` token → `#0f62fe`
+- Release state color: `$support-success` token → `#42be65`
+- Background: `$background` → `#161616` | Surface: `$layer-01` → `#262626`
+- Border: `$border-subtle-01` → `#393939`
+- Text: `$text-primary` → `#f4f4f4` | `$text-secondary` → `#c6c6c6`
 
 ---
 
@@ -44,7 +46,9 @@ kegel-coach/
 ├── src/
 │   ├── main.jsx
 │   ├── App.jsx                ← global state + screen switching
-│   ├── index.css              ← CSS variables + global styles
+│   ├── styles/
+│   │   ├── index.scss         ← selective Carbon imports + custom overrides
+│   │   └── _overrides.scss    ← app-specific style overrides
 │   ├── data/
 │   │   └── program.js         ← 4-week program data
 │   ├── hooks/
@@ -142,11 +146,69 @@ All prefixed with `kc_` to avoid conflicts:
 
 ---
 
+## 🎨 Carbon SCSS Setup
+
+### Install
+```bash
+npm install @carbon/styles
+npm install -D sass
+```
+
+### `src/styles/index.scss` — selective imports only
+```scss
+// 1. Configure theme FIRST
+@use '@carbon/styles/scss/themes' as themes;
+@use '@carbon/styles/scss/theme' with (
+  $theme: themes.$g100
+);
+
+// 2. Reset + base
+@use '@carbon/styles/scss/reset';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+
+// 3. Only components actually used in this app
+@use '@carbon/styles/scss/components/button';
+@use '@carbon/styles/scss/components/toggle';
+@use '@carbon/styles/scss/components/slider';
+@use '@carbon/styles/scss/components/progress-bar';
+
+// 4. App overrides
+@use './overrides';
+```
+
+### `src/styles/_overrides.scss` — custom rules
+```scss
+// Remove border radius from all Carbon components
+.cds--btn,
+.cds--toggle,
+.cds--slider {
+  border-radius: 0 !important;
+}
+
+// Timer number uses IBM Plex Mono
+.timer-display {
+  font-family: 'IBM Plex Mono', monospace;
+}
+```
+
+### In `main.jsx`
+```javascript
+import './styles/index.scss'
+```
+
+### Final bundle size target
+- Full Carbon CSS: ~500kb
+- Our selective imports: ~30–40kb ✅
+
+---
+
 ## 📋 Coding Standards
 
 - Functional components + hooks only
 - Each file max ~150 lines — split if longer
-- CSS custom properties in `index.css`, no inline styles except dynamic values
+- SCSS in `src/styles/index.scss` — use Carbon tokens, never hardcode hex values
+- Custom overrides in `src/styles/_overrides.scss`
 - Comments on all hook logic
 - No `console.log` left in production code
 - Always handle the case where `Navigator.vibrate` is not supported (some browsers)
@@ -157,10 +219,11 @@ All prefixed with `kc_` to avoid conflicts:
 ## 🚫 Things Claude Should NEVER Do In This Project
 
 - Add border radius to cards or buttons
-- Import any UI component library
+- Hardcode hex color values — always use Carbon SCSS tokens
+- Import any other UI component library (no MUI, Ant Design)
 - Use React Router (screen state is enough)
 - Store data anywhere except localStorage with `kc_` prefix
-- Change the color palette
+- Import all of `@carbon/styles` — only import components actually used
 - Use any font other than IBM Plex Sans / IBM Plex Mono
 - Create files longer than 150 lines without splitting
 

@@ -6,44 +6,86 @@
 ## 🧠 Project Context
 
 I am building a personal Kegel exercise trainer web app called **KegelCoach**.
-It is a Progressive Web App (PWA) built with **React + Vite**.
+It is a Progressive Web App (PWA) built with **React + Vite + @carbon/styles (selective SCSS imports)**.
 The design system is **IBM Carbon Dark**.
 The app helps men follow a structured 4-week Kegel exercise program with real-time timer guidance, sound cues, vibration feedback, and session progress tracking.
 
 ---
 
-## 🎨 Design System — IBM Carbon Dark
+## 🎨 Design System — IBM Carbon Dark via `@carbon/styles`
 
-### Colors
+### Install
+```bash
+npm install @carbon/styles
+npm install -D sass
 ```
---cds-background:        #161616
---cds-layer-01:          #262626
---cds-layer-02:          #393939
---cds-border-subtle:     #525252
---cds-border-strong:     #6f6f6f
---cds-interactive:       #0f62fe
---cds-interactive-hover: #0353e9
---cds-support-success:   #42be65
---cds-support-warning:   #f1c21b
---cds-support-error:     #da1e28
---cds-text-primary:      #f4f4f4
---cds-text-secondary:    #c6c6c6
---cds-text-placeholder:  #6f6f6f
+
+### Colors — use Carbon SCSS tokens, never hardcode hex
+```scss
+// These resolve automatically when using $g100 theme
+$background:       #161616   // --cds-background
+$layer-01:         #262626   // --cds-layer-01
+$layer-02:         #393939   // --cds-layer-02
+$border-subtle-01: #393939
+$interactive:      #0f62fe   // IBM Blue — squeeze state
+$support-success:  #42be65   // IBM Green — release state
+$support-warning:  #f1c21b
+$support-error:    #da1e28
+$text-primary:     #f4f4f4
+$text-secondary:   #c6c6c6
+```
+
+### `src/styles/index.scss` — selective imports only
+```scss
+// 1. Theme first
+@use '@carbon/styles/scss/themes' as themes;
+@use '@carbon/styles/scss/theme' with (
+  $theme: themes.$g100
+);
+
+// 2. Base
+@use '@carbon/styles/scss/reset';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+
+// 3. Only components used in this app
+@use '@carbon/styles/scss/components/button';
+@use '@carbon/styles/scss/components/toggle';
+@use '@carbon/styles/scss/components/slider';
+@use '@carbon/styles/scss/components/progress-bar';
+
+// 4. App overrides
+@use './overrides';
+```
+
+### `src/styles/_overrides.scss`
+```scss
+// IBM Carbon sharp corners — remove all border radius
+.cds--btn,
+.cds--toggle,
+.cds--slider {
+  border-radius: 0 !important;
+}
+
+// Timer display font
+.timer-display {
+  font-family: 'IBM Plex Mono', monospace;
+}
 ```
 
 ### Typography
-- Font family: `IBM Plex Sans` (headings, body, labels)
-- Monospace font: `IBM Plex Mono` (timer countdown display)
-- Import from Google Fonts:
-  `https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap`
+- Body: IBM Plex Sans (loaded via `@carbon/styles/scss/type`)
+- Timer: IBM Plex Mono (loaded via `@carbon/styles/scss/type`)
+- No Google Fonts import needed — Carbon handles it
 
 ### Component Rules
-- **No border radius** on buttons and cards — sharp corners, IBM Carbon style
-- Buttons: solid IBM Blue `#0f62fe`, full width on mobile
-- Cards: background `#262626`, border `1px solid #393939`
-- Spacing: base unit 8px
-- Active/squeeze state color: `#0f62fe` (IBM Blue)
-- Rest/release state color: `#42be65` (IBM Green)
+- **No border radius** — sharp corners, overridden in `_overrides.scss`
+- Use `cds--btn cds--btn--primary` classes for buttons
+- Use `cds--toggle` for settings toggles
+- Use `cds--slider` for volume control
+- Custom components (CircularTimer, StatCard) use Carbon tokens via SCSS variables
+- Squeeze state: `$interactive` token
+- Release state: `$support-success` token
 
 ---
 
@@ -57,7 +99,9 @@ kegel-coach/
 ├── src/
 │   ├── main.jsx
 │   ├── App.jsx                # Root with router + global state
-│   ├── index.css              # Global styles + CSS variables
+│   ├── styles/
+│   │   ├── index.scss         # Selective Carbon imports
+│   │   └── _overrides.scss    # App-specific overrides
 │   ├── data/
 │   │   └── program.js         # 4-week exercise program data
 │   ├── hooks/
@@ -469,21 +513,28 @@ export default defineConfig({
 When I give you this document, please:
 
 1. **Scaffold the project** using `npm create vite@latest kegel-coach -- --template react`
-2. **Install dependencies**: only `vite` + `@vitejs/plugin-react` — no UI libraries needed
-3. **Add Google Fonts** link in `index.html` for IBM Plex Sans + IBM Plex Mono
-4. **Create all files** exactly as specified in the project structure above
-5. **Implement each hook** with the exact logic described
-6. **Build each screen** following the layout spec, using only IBM Carbon Dark colors and IBM Plex fonts
-7. **Wire up App.jsx** with screen state switching as described
-8. **Set up PWA manifest**
-9. **Run `npm run dev`** and confirm it starts without errors
+2. **Install dependencies**:
+   ```bash
+   npm install @carbon/styles
+   npm install -D sass
+   ```
+3. **Create `src/styles/index.scss`** with selective Carbon imports as specified above
+4. **Create `src/styles/_overrides.scss`** with border-radius resets
+5. **Import styles in `main.jsx`**: `import './styles/index.scss'`
+6. **Create all files** exactly as specified in the project structure above
+7. **Implement each hook** with the exact logic described
+8. **Build each screen** using Carbon component classes (`cds--btn`, `cds--toggle`, etc.)
+9. **Wire up App.jsx** with screen state switching as described
+10. **Set up PWA manifest**
+11. **Run `npm run dev`** and confirm it starts without errors
 
 ### Coding Standards
 - Functional components only, hooks-based
 - No class components
-- No external UI libraries (no MUI, no Ant Design, no Carbon React)
-- Pure CSS in `index.css` using CSS custom properties
-- Inline styles only where dynamic (e.g. timer animation progress)
+- No other UI libraries (no MUI, no Ant Design, no Carbon React components)
+- SCSS in `src/styles/` — use Carbon tokens, never hardcode hex values
+- Only import Carbon SCSS modules actually used — keep bundle under 40kb
+- Inline styles only where dynamic (e.g. timer animation progress via `stroke-dashoffset`)
 - Each file max ~150 lines — split if longer
 - Comments on all hook logic
 

@@ -1,0 +1,13 @@
+{
+  "name": "KegelCoach",
+  "short_name": "KegelCoach",
+  "description": "Personal pelvic floor trainer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#161616",
+  "theme_color": "#0f62fe",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

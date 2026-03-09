@@ -1,0 +1,202 @@
+// Remove border radius from all Carbon components — sharp corners only
+.cds--btn,
+.cds--toggle,
+.cds--slider {
+  border-radius: 0 !important;
+}
+
+// Timer number uses IBM Plex Mono
+.timer-display {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+// App global layout
+#root {
+  min-height: 100dvh;
+  background-color: var(--cds-background);
+  color: var(--cds-text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+// Screen container — mobile-first, max 480px centered
+.screen {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// Stat card
+.stat-card {
+  background-color: var(--cds-layer-01);
+  border: 1px solid var(--cds-border-subtle-01);
+  padding: 0.75rem 1rem;
+  flex: 1;
+
+  .stat-card__value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--cds-text-primary);
+    line-height: 1;
+  }
+
+  .stat-card__label {
+    font-size: 0.75rem;
+    color: var(--cds-text-secondary);
+    margin-top: 0.25rem;
+  }
+}
+
+// Bottom nav
+.bottom-nav {
+  display: flex;
+  border-top: 1px solid var(--cds-border-subtle-01);
+  background-color: var(--cds-layer-01);
+
+  .bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    color: var(--cds-text-secondary);
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: color 0.15s;
+
+    &--active {
+      color: var(--cds-interactive);
+    }
+  }
+}
+
+// Week badge pill
+.week-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--cds-layer-02);
+  border: 1px solid var(--cds-border-subtle-01);
+  font-size: 0.875rem;
+  color: var(--cds-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+// Exercise card
+.exercise-card {
+  background-color: var(--cds-layer-01);
+  border: 1px solid var(--cds-border-subtle-01);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+
+  .exercise-card__name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cds-text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .exercise-card__meta {
+    font-size: 0.8125rem;
+    color: var(--cds-text-secondary);
+  }
+}
+
+// Phase label
+.phase-label {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+
+  &--squeeze {
+    color: var(--cds-interactive);
+  }
+
+  &--release {
+    color: var(--cds-support-success);
+  }
+
+  &--idle {
+    color: var(--cds-text-secondary);
+  }
+}
+
+// Session controls
+.session-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+// Pause overlay
+.pause-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 100;
+}
+
+// Complete screen checkmark
+.complete-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+
+  svg {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+// Settings section
+.settings-section {
+  margin-bottom: 1.5rem;
+
+  .settings-section__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cds-text-secondary);
+    border-bottom: 1px solid var(--cds-border-subtle-01);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+// Pattern selector buttons
+.pattern-selector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  .pattern-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    background-color: var(--cds-layer-01);
+    border: 1px solid var(--cds-border-subtle-01);
+    color: var(--cds-text-secondary);
+    cursor: pointer;
+
+    &--active {
+      border-color: var(--cds-interactive);
+      color: var(--cds-interactive);
+      background-color: var(--cds-layer-02);
+    }
+  }
+}
