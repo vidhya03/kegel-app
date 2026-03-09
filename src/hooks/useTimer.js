@@ -2,6 +2,8 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 
 // useTimer — manages the squeeze/release countdown sequence
 // Supports multi-exercise sessions with sets and reps
+// Handles background tab/minimize via Page Visibility API
+// Requests Screen Wake Lock to keep screen on during session
 export function useTimer({ onPhaseChange, onComplete } = {}) {
   const [timeLeft, setTimeLeft] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
@@ -13,6 +15,8 @@ export function useTimer({ onPhaseChange, onComplete } = {}) {
 
   // Internal refs for interval and mutable state (avoid stale closures)
   const intervalRef = useRef(null)
+  const hiddenAtRef = useRef(null)   // timestamp when page was hidden
+  const wakeLockRef = useRef(null)   // Screen Wake Lock handle
   const stateRef = useRef({
     exercises: [],
     phase: 'idle',
@@ -157,6 +161,72 @@ export function useTimer({ onPhaseChange, onComplete } = {}) {
     // Immediately advance to next rep
     stateRef.current.timeLeft = 0
     advance()
+  }, [advance])
+
+  // Screen Wake Lock — keep screen on while session is active
+  useEffect(() => {
+    if (!isRunning) return
+    let released = false
+
+    const acquireWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockRef.current = await navigator.wakeLock.request('screen')
+          wakeLockRef.current.addEventListener('release', () => {
+            if (!released) wakeLockRef.current = null
+          })
+        }
+      } catch {
+        // Wake lock denied or unsupported — timer still works
+      }
+    }
+
+    // Re-acquire wake lock after page becomes visible again (browser releases it on hide)
+    const handleVisibility = () => {
+      if (!document.hidden && isRunning && !wakeLockRef.current) acquireWakeLock()
+    }
+
+    acquireWakeLock()
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      released = true
+      document.removeEventListener('visibilitychange', handleVisibility)
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release()
+        wakeLockRef.current = null
+      }
+    }
+  }, [isRunning])
+
+  // Page Visibility API — fast-forward timer when returning from background
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        // Record when app went to background
+        hiddenAtRef.current = Date.now()
+      } else if (hiddenAtRef.current && !stateRef.current.isPaused && stateRef.current.phase !== 'idle') {
+        // App returned from background — fast-forward elapsed time
+        let elapsed = Math.floor((Date.now() - hiddenAtRef.current) / 1000)
+        hiddenAtRef.current = null
+
+        // Drain elapsed seconds through phases
+        while (elapsed > 0 && stateRef.current.phase !== 'idle') {
+          if (elapsed >= stateRef.current.timeLeft) {
+            elapsed -= stateRef.current.timeLeft
+            stateRef.current.timeLeft = 0
+            advance()
+          } else {
+            stateRef.current.timeLeft -= elapsed
+            elapsed = 0
+          }
+        }
+        setTimeLeft(stateRef.current.timeLeft)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [advance])
 
   // Cleanup interval on unmount

@@ -1,3 +1,80 @@
+// Light theme — blue-tinted palette, applied when <html data-theme="light">
+[data-theme="light"] {
+  --cds-background: #eef2ff;
+  --cds-background-hover: #e0e7ff;
+  --cds-layer-01: #ffffff;
+  --cds-layer-02: #e8eeff;
+  --cds-layer-03: #d0ddff;
+  --cds-layer-hover-01: #dde5ff;
+  --cds-text-primary: #0a0f2e;
+  --cds-text-secondary: #3d4b7c;
+  --cds-text-placeholder: #8896b8;
+  --cds-border-subtle-01: #c5d0ee;
+  --cds-border-subtle-02: #a8b8e0;
+  --cds-border-strong-01: #6b7fc4;
+  --cds-interactive: #0f62fe;
+  --cds-support-success: #1a8a3c;
+  --cds-support-error: #c21e28;
+  --cds-support-warning: #d4a000;
+  --cds-link-primary: #0043ce;
+  --cds-icon-primary: #0a0f2e;
+  --cds-icon-secondary: #3d4b7c;
+
+  background-color: #eef2ff;
+  color: #0a0f2e;
+
+  // Pattern selector buttons — strong active highlight
+  .pattern-btn {
+    background-color: #ffffff;
+    border-color: #c5d0ee;
+    color: #3d4b7c;
+
+    &--active {
+      background-color: #d0e2ff;
+      border-color: #0f62fe;
+      color: #0043ce;
+      font-weight: 600;
+    }
+  }
+
+  // Carbon buttons — override compiled dark-theme values
+  .cds--btn--secondary {
+    background-color: #d0ddff;
+    color: #0a0f2e;
+    border-color: transparent;
+
+    &:hover {
+      background-color: #b8caff;
+      color: #0a0f2e;
+    }
+  }
+
+  .cds--btn--ghost {
+    color: #0043ce;
+
+    &:hover {
+      background-color: #e0e7ff;
+      color: #0043ce;
+    }
+  }
+
+  // Bottom nav
+  .bottom-nav {
+    background-color: #ffffff;
+    border-top-color: #c5d0ee;
+
+    .bottom-nav__item {
+      color: #3d4b7c;
+    }
+  }
+
+  // Settings section title border
+  .settings-section__title {
+    border-bottom-color: #c5d0ee;
+    color: #3d4b7c;
+  }
+}
+
 // Remove border radius from all Carbon components — sharp corners only
 .cds--btn,
 .cds--toggle,
