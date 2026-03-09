@@ -1,5 +1,5 @@
 // BottomNav — persists across Home, Progress, Complete, and Settings screens
-export default function BottomNav({ currentScreen, onNavigate }) {
+export default function BottomNav({ currentScreen, onNavigate, theme, onToggleTheme }) {
   return (
     <nav className="bottom-nav">
       <button
@@ -46,6 +46,25 @@ export default function BottomNav({ currentScreen, onNavigate }) {
           <path d="M27 16.76V16l2-3.63-4-6.93-4.11 1.1A9.94 9.94 0 0 0 19 5.38L18 1h-4l-1 4.38a9.94 9.94 0 0 0-1.89 1.16L7 5.44l-4 6.93L5 15.24A10.06 10.06 0 0 0 5 16v.76l-2 3.63 4 6.93 4.11-1.1a9.94 9.94 0 0 0 1.89 1.16L14 31h4l1-4.38a9.94 9.94 0 0 0 1.89-1.16L25 26.56l4-6.93zM16 22a6 6 0 1 1 6-6 6 6 0 0 1-6 6z"/>
         </svg>
         <span>Settings</span>
+      </button>
+
+      {/* Theme toggle — lives in nav to avoid overlapping screen content */}
+      <button
+        className="bottom-nav__item"
+        onClick={onToggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+      >
+        {theme === 'dark' ? (
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="currentColor">
+            <circle cx="16" cy="16" r="6"/>
+            <path stroke="currentColor" strokeWidth="2" fill="none" d="M16 2v4M16 26v4M2 16h4M26 16h4M5.6 5.6l2.8 2.8M23.6 23.6l2.8 2.8M5.6 26.4l2.8-2.8M23.6 8.4l2.8-2.8"/>
+          </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M13.502 5.414a15.075 15.075 0 0 0 11.594 17.99 11.936 11.936 0 0 1-9.594 4.444C9.04 27.848 4 22.768 4 16.5A12.015 12.015 0 0 1 13.502 5.414z"/>
+          </svg>
+        )}
+        <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
       </button>
     </nav>
   )
