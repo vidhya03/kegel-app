@@ -105,55 +105,70 @@ export default function SettingsScreen({ settings, onSave, onResetProgress }) {
       <div className="settings-section">
         <div className="settings-section__title">Vibration</div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <span style={{ color: 'var(--cds-text-primary)' }}>Vibration</span>
-          <button
-            className={`cds--btn cds--btn--sm ${local.vibrationEnabled ? 'cds--btn--primary' : 'cds--btn--secondary'}`}
-            onClick={() => update('vibrationEnabled', !local.vibrationEnabled)}
-          >
-            {local.vibrationEnabled ? 'ON' : 'OFF'}
-          </button>
-        </div>
-
-        {local.vibrationEnabled && (
+        {!vibration.isSupported ? (
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: 'var(--cds-layer-02)',
+            border: '1px solid var(--cds-border-subtle-01)',
+            fontSize: '0.875rem',
+            color: 'var(--cds-text-secondary)',
+            lineHeight: 1.5
+          }}>
+            Vibration is not supported on iOS / Safari. Use sound cues instead.
+          </div>
+        ) : (
           <>
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem' }}>Squeeze Pattern</div>
-              <div className="pattern-selector">
-                {[
-                  { key: 'short-short', label: 'Short-Short' },
-                  { key: 'long', label: 'Long Buzz' },
-                  { key: 'pulse', label: 'Pulse' }
-                ].map(p => (
-                  <button
-                    key={p.key}
-                    className={`pattern-btn ${local.squeezePattern === p.key ? 'pattern-btn--active' : ''}`}
-                    onClick={() => update('squeezePattern', p.key)}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <span style={{ color: 'var(--cds-text-primary)' }}>Vibration</span>
+              <button
+                className={`cds--btn cds--btn--sm ${local.vibrationEnabled ? 'cds--btn--primary' : 'cds--btn--secondary'}`}
+                onClick={() => update('vibrationEnabled', !local.vibrationEnabled)}
+              >
+                {local.vibrationEnabled ? 'ON' : 'OFF'}
+              </button>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem' }}>Release Pattern</div>
-              <div className="pattern-selector">
-                {['soft', 'none'].map(p => (
-                  <button
-                    key={p}
-                    className={`pattern-btn ${local.releasePattern === p ? 'pattern-btn--active' : ''}`}
-                    onClick={() => update('releasePattern', p)}
-                  >
-                    {p.charAt(0).toUpperCase() + p.slice(1)}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {local.vibrationEnabled && (
+              <>
+                <div style={{ marginBottom: '1rem' }}>
+                  <div style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem' }}>Squeeze Pattern</div>
+                  <div className="pattern-selector">
+                    {[
+                      { key: 'short-short', label: 'Short-Short' },
+                      { key: 'long', label: 'Long Buzz' },
+                      { key: 'pulse', label: 'Pulse' }
+                    ].map(p => (
+                      <button
+                        key={p.key}
+                        className={`pattern-btn ${local.squeezePattern === p.key ? 'pattern-btn--active' : ''}`}
+                        onClick={() => update('squeezePattern', p.key)}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            <button className="cds--btn cds--btn--sm cds--btn--ghost" onClick={() => vibration.testVibration()}>
-              Test Vibration
-            </button>
+                <div style={{ marginBottom: '1rem' }}>
+                  <div style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem' }}>Release Pattern</div>
+                  <div className="pattern-selector">
+                    {['soft', 'none'].map(p => (
+                      <button
+                        key={p}
+                        className={`pattern-btn ${local.releasePattern === p ? 'pattern-btn--active' : ''}`}
+                        onClick={() => update('releasePattern', p)}
+                      >
+                        {p.charAt(0).toUpperCase() + p.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button className="cds--btn cds--btn--sm cds--btn--ghost" onClick={() => vibration.testVibration()}>
+                  Test Vibration
+                </button>
+              </>
+            )}
           </>
         )}
       </div>

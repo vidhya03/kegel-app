@@ -12,9 +12,13 @@ const RELEASE_PATTERNS = {
   'none': null
 }
 
-// Safe vibrate wrapper — Navigator.vibrate not supported on all browsers (e.g. iOS)
+// iOS Safari has never supported navigator.vibrate — it is blocked at OS level.
+// This flag is the single source of truth used by the hook and the UI.
+export const isVibrationSupported = 'vibrate' in navigator
+
+// Safe vibrate wrapper
 function vibrate(pattern) {
-  if (!('vibrate' in navigator)) return
+  if (!isVibrationSupported) return
   if (!pattern) return
   try {
     navigator.vibrate(pattern)
@@ -25,24 +29,22 @@ function vibrate(pattern) {
 
 export function useVibration(settings) {
   const vibrateOnSqueeze = useCallback(() => {
-    if (!settings.vibrationEnabled) return
+    if (!isVibrationSupported || !settings.vibrationEnabled) return
     const pattern = SQUEEZE_PATTERNS[settings.squeezePattern] || SQUEEZE_PATTERNS['short-short']
     vibrate(pattern)
   }, [settings])
 
   const vibrateOnRelease = useCallback(() => {
-    if (!settings.vibrationEnabled) return
+    if (!isVibrationSupported || !settings.vibrationEnabled) return
     const pattern = RELEASE_PATTERNS[settings.releasePattern]
     if (pattern) vibrate(pattern)
   }, [settings])
 
   const testVibration = useCallback(() => {
-    // Play all patterns in sequence with gaps
-    const supported = 'vibrate' in navigator
-    if (!supported) return false
+    if (!isVibrationSupported) return false
     vibrate([80, 50, 80, 100, 200, 100, 50, 30, 50, 30, 50])
     return true
   }, [])
 
-  return { vibrateOnSqueeze, vibrateOnRelease, testVibration }
+  return { vibrateOnSqueeze, vibrateOnRelease, testVibration, isSupported: isVibrationSupported }
 }
