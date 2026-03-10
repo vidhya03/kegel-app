@@ -17,6 +17,8 @@ export default function App() {
   const [theme, setTheme] = useState('dark')
 
   useEffect(() => {
+    // Switch Carbon theme class — cds--g10 (light) or cds--g100 (dark)
+    document.documentElement.className = theme === 'light' ? 'cds--g10' : 'cds--g100'
     document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : '')
   }, [theme])
 
