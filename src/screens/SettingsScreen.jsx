@@ -283,7 +283,7 @@ export default function SettingsScreen({ settings, onSave, onResetProgress }) {
       <div className="settings-section">
         <div className="settings-section__title">About</div>
         <p style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
-          KegelCoach v1.0
+          KegelCoach v{__APP_VERSION__}
         </p>
       </div>
     </div>
