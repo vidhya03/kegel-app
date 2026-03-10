@@ -22,19 +22,24 @@ function audioBufferToWavUrl(buffer) {
   return URL.createObjectURL(new Blob([ab], { type: 'audio/wav' }))
 }
 
-// Generate a near-silent looping WAV to keep iOS audio session alive through lock screen
-async function createKeepAliveWavUrl() {
+// Generate a completely silent looping WAV to keep iOS audio session alive through lock screen
+// iOS only needs audio playback to be active — audible content is not required
+function createKeepAliveWavUrl() {
   try {
     const sampleRate = 22050
-    const offlineCtx = new OfflineAudioContext(1, sampleRate * 3, sampleRate) // 3s loop
-    const osc = offlineCtx.createOscillator()
-    const gain = offlineCtx.createGain()
-    gain.gain.value = 0.02 // barely audible — iOS needs real signal to maintain session
-    osc.frequency.value = 440
-    osc.connect(gain); gain.connect(offlineCtx.destination)
-    osc.start(0); osc.stop(3)
-    const buffer = await offlineCtx.startRendering()
-    return audioBufferToWavUrl(buffer)
+    const numSamples = sampleRate * 3 // 3s loop of silence
+    const dataLength = numSamples * 2
+    const ab = new ArrayBuffer(44 + dataLength)
+    const view = new DataView(ab)
+    const write = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)) }
+    write(0, 'RIFF'); view.setUint32(4, 36 + dataLength, true)
+    write(8, 'WAVE'); write(12, 'fmt ')
+    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true)
+    view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true)
+    view.setUint16(32, 2, true); view.setUint16(34, 16, true)
+    write(36, 'data'); view.setUint32(40, dataLength, true)
+    // Leave PCM samples as zero — perfectly silent
+    return URL.createObjectURL(new Blob([ab], { type: 'audio/wav' }))
   } catch { return null }
 }
 
@@ -142,12 +147,12 @@ export function useSound(settings) {
     }
 
     if (!keepAliveAudioRef.current) {
-      const url = await createKeepAliveWavUrl()
+      const url = createKeepAliveWavUrl()
       if (url) {
         keepAliveUrlRef.current = url
         const audio = new Audio(url)
         audio.loop = true
-        audio.volume = 0.02 // audible enough for iOS to maintain audio session
+        audio.volume = 1.0 // volume is irrelevant — WAV is silent PCM zeros
         try { await audio.play() } catch {}
         keepAliveAudioRef.current = audio
       }
