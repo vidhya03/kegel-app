@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(curl:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "WebFetch(domain:kegel.labkit.in)",
+      "Bash(npm run:*)"
     ]
   }
 }

@@ -1,5 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import StatCard from '../components/StatCard'
+import HowToModal from '../components/HowToModal'
 import { PROGRAM, estimateDuration } from '../data/program'
 
 const WEEKS = [
@@ -71,13 +72,32 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
 
   const alreadyDoneTarget = doneToday >= sessionsPerDay
   const activeWeekMeta = WEEKS.find(w => w.week === week)
+  const [showHowTo, setShowHowTo] = useState(false)
 
   return (
     <div className="screen">
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
         <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--cds-text-primary)' }}>KegelCoach</h1>
-        <span style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)' }}>Day {day}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            onClick={() => setShowHowTo(true)}
+            aria-label="How to do Kegel exercises"
+            title="How to do Kegel exercises"
+            style={{
+              background: 'none',
+              border: '1px solid var(--cds-border-subtle-01)',
+              color: 'var(--cds-text-secondary)',
+              width: 28, height: 28,
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.875rem', fontWeight: 700
+            }}
+          >
+            ?
+          </button>
+          <span style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)' }}>Day {day}</span>
+        </div>
       </div>
 
       {/* Week selector — tab strip */}
@@ -213,6 +233,8 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
           Well done! Target sessions complete today ({doneToday}/{sessionsPerDay})
         </div>
       )}
+
+      {showHowTo && <HowToModal onClose={() => setShowHowTo(false)} />}
     </div>
   )
 }
