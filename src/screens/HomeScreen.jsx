@@ -72,7 +72,15 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
 
   const alreadyDoneTarget = doneToday >= sessionsPerDay
   const activeWeekMeta = WEEKS.find(w => w.week === week)
-  const [showHowTo, setShowHowTo] = useState(false)
+
+  // Auto-show for first-time users (no sessions yet and haven't seen it)
+  const isFirstTime = !progress.sessions?.length && !localStorage.getItem('kc_seen_howto')
+  const [showHowTo, setShowHowTo] = useState(isFirstTime)
+
+  const handleCloseHowTo = () => {
+    localStorage.setItem('kc_seen_howto', '1')
+    setShowHowTo(false)
+  }
 
   return (
     <div className="screen">
@@ -86,15 +94,15 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
             title="How to do Kegel exercises"
             style={{
               background: 'none',
-              border: '1px solid var(--cds-border-subtle-01)',
-              color: 'var(--cds-text-secondary)',
-              width: 28, height: 28,
+              border: '1px solid var(--cds-interactive)',
+              color: 'var(--cds-interactive)',
+              padding: '0.25rem 0.625rem',
               cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.875rem', fontWeight: 700
+              display: 'flex', alignItems: 'center', gap: '0.3rem',
+              fontSize: '0.75rem', fontWeight: 600
             }}
           >
-            ?
+            <span style={{ fontSize: '0.875rem', fontWeight: 700, lineHeight: 1 }}>?</span> How to
           </button>
           <span style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)' }}>Day {day}</span>
         </div>
@@ -234,7 +242,7 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
         </div>
       )}
 
-      {showHowTo && <HowToModal onClose={() => setShowHowTo(false)} />}
+      {showHowTo && <HowToModal onClose={handleCloseHowTo} />}
     </div>
   )
 }

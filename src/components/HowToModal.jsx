@@ -1,4 +1,4 @@
-// HowToModal — first-time user guide for squeeze and release technique
+// HowToModal — first-time user guide, plain everyday language
 export default function HowToModal({ onClose }) {
   return (
     <div
@@ -42,37 +42,50 @@ export default function HowToModal({ onClose }) {
           </button>
         </div>
 
+        {/* Plain-English intro */}
+        <div style={{
+          background: 'var(--cds-layer-02)',
+          border: '1px solid var(--cds-border-subtle-01)',
+          padding: '0.875rem 1rem',
+          marginBottom: '1.25rem',
+          fontSize: '0.9375rem',
+          color: 'var(--cds-text-primary)',
+          lineHeight: 1.6
+        }}>
+          Think of it like this: <strong>imagine you are trying to stop yourself from peeing mid-stream.</strong> The muscles you squeeze to do that — those are the ones you train here. That's it.
+        </div>
+
         {/* Find your muscles */}
         <Section title="1. Find the right muscles">
-          <p>Imagine you are trying to stop the flow of urine mid-stream. The muscles you tighten to do that are your pelvic floor muscles.</p>
-          <p>You can also try to lift and squeeze as if you are picking up a small object with your pelvic floor.</p>
-          <Tip>Do not tighten your stomach, thighs, or buttocks — only the pelvic floor.</Tip>
+          <p>Try to squeeze and lift that stopping-pee feeling right now. Hold for 2 seconds, then let go completely.</p>
+          <p>If you felt something tighten inside — that's it. You found the right muscles.</p>
+          <Tip>Only those inner muscles should move. Your belly, thighs, and bum should stay relaxed.</Tip>
         </Section>
 
         {/* Squeeze */}
         <Section title="2. SQUEEZE — tighten and hold">
           <PhaseTag phase="squeeze" />
-          <p>Contract your pelvic floor muscles firmly. Hold for the number of seconds shown in the timer.</p>
-          <p>Breathe normally throughout — do not hold your breath.</p>
-          <Tip>Think of lifting upward and inward, not pushing outward.</Tip>
+          <p>Tighten that stopping-pee feeling and hold it for the time shown on the timer.</p>
+          <p>Keep breathing normally. Don't hold your breath.</p>
+          <Tip>Think: lift and squeeze inward — not push outward.</Tip>
         </Section>
 
         {/* Release */}
-        <Section title="3. RELEASE — fully relax">
+        <Section title="3. RELEASE — fully let go">
           <PhaseTag phase="release" />
-          <p>Completely let go of the muscles. Allow them to relax for the full rest period shown.</p>
-          <p>The release phase is just as important as the squeeze. Muscles need recovery to grow stronger.</p>
-          <Tip>You should feel a clear difference between the tight hold and the full relaxation.</Tip>
+          <p>Completely relax those muscles. Go fully loose for the whole rest time shown.</p>
+          <p>The rest is just as important as the squeeze — your muscles need it to get stronger.</p>
+          <Tip>You should feel a clear difference: tight during squeeze, fully loose during release.</Tip>
         </Section>
 
-        {/* Tips */}
-        <Section title="Common mistakes to avoid">
-          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--cds-text-secondary)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+        {/* Mistakes */}
+        <Section title="Common mistakes">
+          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--cds-text-secondary)', fontSize: '0.875rem', lineHeight: 1.7 }}>
             <li>Holding your breath during the squeeze</li>
-            <li>Pushing down instead of lifting up</li>
-            <li>Tensing abs, glutes, or inner thighs</li>
-            <li>Shortening the release / rest period</li>
-            <li>Exercising with a full bladder</li>
+            <li>Tensing your stomach, bum, or thighs instead</li>
+            <li>Pushing outward instead of lifting inward</li>
+            <li>Cutting the rest short before the timer ends</li>
+            <li>Doing this with a full bladder</li>
           </ul>
         </Section>
 

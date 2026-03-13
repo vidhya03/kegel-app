@@ -1,5 +1,7 @@
 # KegelCoach
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/1cef99a7-6793-4205-bc39-f686e7f90b03/deploy-status)](https://app.netlify.com/projects/astonishing-melba-bb57b7/deploys)
+
 A free, structured pelvic floor trainer PWA. Guides you through a 4-week Kegel exercise program with real-time timer guidance, sound cues, and vibration feedback.
 
 **Live:** [kegel.labkit.in](https://kegel.labkit.in)

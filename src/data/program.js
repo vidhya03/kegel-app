@@ -14,7 +14,7 @@ export const PROGRAM = {
           restSeconds: 3,
           reps: 10,
           sets: 2,
-          description: 'Squeeze and hold, then fully release.'
+          description: 'Tighten (like stopping pee), hold for the count, then fully let go. That\'s one rep.'
         }
       ],
       sessionsPerDay: 2
@@ -32,7 +32,7 @@ export const PROGRAM = {
           restSeconds: 4,
           reps: 10,
           sets: 3,
-          description: 'Longer hold with full release between reps.'
+          description: 'Tighten and hold for 5 full seconds, then completely relax. Don\'t rush the rest.'
         },
         {
           id: 'quick_flicks',
@@ -41,7 +41,7 @@ export const PROGRAM = {
           restSeconds: 1,
           reps: 15,
           sets: 2,
-          description: 'Rapid contract-release pulses.'
+          description: 'Fast tight-and-let-go pulses — like quick blinks of the muscle.'
         }
       ],
       sessionsPerDay: 2
@@ -59,7 +59,7 @@ export const PROGRAM = {
           restSeconds: 5,
           reps: 10,
           sets: 3,
-          description: 'Extended hold building endurance.'
+          description: 'Squeeze and hold tight for 8 seconds — keep breathing. Then let go fully for 5 seconds.'
         },
         {
           id: 'quick_flicks',
@@ -68,7 +68,7 @@ export const PROGRAM = {
           restSeconds: 1,
           reps: 20,
           sets: 2,
-          description: 'Rapid contract-release pulses.'
+          description: 'Fast tight-and-let-go pulses — like quick blinks of the muscle.'
         },
         {
           id: 'staircase',
@@ -77,7 +77,7 @@ export const PROGRAM = {
           restSeconds: 6,
           reps: 8,
           sets: 2,
-          description: 'Squeeze in 3 gradual levels (25% → 50% → 100%) then release in steps.'
+          description: 'Tighten in 3 rising levels: gentle → medium → full. Then release in the same steps going down.'
         }
       ],
       sessionsPerDay: 2
@@ -95,7 +95,7 @@ export const PROGRAM = {
           restSeconds: 5,
           reps: 12,
           sets: 3,
-          description: 'Maximum hold with full release.'
+          description: 'Full max squeeze held for 10 seconds — stay relaxed everywhere else. Release completely.'
         },
         {
           id: 'quick_flicks',
@@ -104,7 +104,7 @@ export const PROGRAM = {
           restSeconds: 1,
           reps: 25,
           sets: 3,
-          description: 'Rapid contract-release pulses.'
+          description: 'Fast tight-and-let-go pulses — like quick blinks of the muscle.'
         },
         {
           id: 'staircase',
@@ -113,7 +113,7 @@ export const PROGRAM = {
           restSeconds: 6,
           reps: 8,
           sets: 2,
-          description: 'Squeeze in 3 gradual levels then release in steps.'
+          description: 'Tighten in 3 rising levels: gentle → medium → full. Then release in the same steps going down.'
         }
       ],
       sessionsPerDay: 2

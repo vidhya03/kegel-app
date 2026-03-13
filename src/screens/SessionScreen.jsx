@@ -136,6 +136,11 @@ export default function SessionScreen({ onComplete, onStop, settings, progress, 
       {/* Phase label */}
       <PhaseLabel phase={timer.phase} />
 
+      {/* Plain-language cue */}
+      <div style={{ textAlign: 'center', marginTop: '0.375rem', fontSize: '0.8125rem', color: 'var(--cds-text-secondary)', fontStyle: 'italic' }}>
+        {timer.phase === 'squeeze' ? 'Tighten like stopping pee — hold it' : 'Fully relax — let go completely'}
+      </div>
+
       {/* Rep counter */}
       <div style={{ textAlign: 'center', marginTop: '0.75rem', fontSize: '1rem', color: 'var(--cds-text-secondary)' }}>
         Rep {timer.currentRep} / {currentEx?.reps}
