@@ -4,10 +4,19 @@ import HowToModal from '../components/HowToModal'
 import { PROGRAM, estimateDuration } from '../data/program'
 
 const WEEKS = [
-  { week: 1, label: 'Week 1', name: 'Foundation', difficulty: 1 },
-  { week: 2, label: 'Week 2', name: 'Endurance',  difficulty: 2 },
-  { week: 3, label: 'Week 3', name: 'Strength',   difficulty: 3 },
-  { week: 4, label: 'Week 4', name: 'Power',       difficulty: 4 },
+  { week: 1,  label: 'Week 1',  name: 'Foundation',     difficulty: 1 },
+  { week: 2,  label: 'Week 2',  name: 'Endurance',      difficulty: 2 },
+  { week: 3,  label: 'Week 3',  name: 'Strength',       difficulty: 3 },
+  { week: 4,  label: 'Week 4',  name: 'Power',          difficulty: 4 },
+  { week: 5,  label: 'Week 5',  name: 'Strengthening',  difficulty: 4 },
+  { week: 6,  label: 'Week 6',  name: 'Elevator',       difficulty: 4 },
+  { week: 7,  label: 'Week 7',  name: 'Rep Density',    difficulty: 4 },
+  { week: 8,  label: 'Week 8',  name: 'Peak Strength',  difficulty: 4 },
+  { week: 9,  label: 'Week 9',  name: 'Consolidation',  difficulty: 4 },
+  { week: 10, label: 'Week 10', name: 'Endurance Push', difficulty: 4 },
+  { week: 11, label: 'Week 11', name: 'Elite Control',  difficulty: 4 },
+  { week: 12,            label: 'Week 12',     name: 'Graduation',     difficulty: 4 },
+  { week: 'maintenance', label: 'Maintenance', name: 'For Life',       difficulty: 4 },
 ]
 
 function DifficultyDots({ level }) {
@@ -52,7 +61,7 @@ function PlayBtn({ onClick, label }) {
 export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions }) {
   const week = progress.week
   const day = progress.day
-  const weekKey = `week${week}`
+  const weekKey = week === 'maintenance' ? 'maintenance' : `week${week}`
   const weekData = PROGRAM[weekKey]
   const dayData = weekData?.days?.[day - 1]
   const exercises = dayData?.exercises || []
@@ -108,9 +117,9 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
         </div>
       </div>
 
-      {/* Week selector — tab strip */}
+      {/* Week selector — scrollable tab strip */}
       <div style={{ background: 'var(--cds-layer-01)', border: '1px solid var(--cds-border-subtle-01)', marginBottom: '1rem' }}>
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none' }}>
           {WEEKS.map(w => {
             const isActive = week === w.week
             return (
@@ -118,8 +127,8 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
                 key={w.week}
                 onClick={() => onSetWeek(w.week)}
                 style={{
-                  flex: 1,
-                  padding: '0.75rem 0.25rem',
+                  flexShrink: 0,
+                  padding: '0.75rem 0.875rem',
                   background: isActive ? '#0f62fe22' : 'transparent',
                   border: 'none',
                   borderBottom: `3px solid ${isActive ? '#0f62fe' : '#393939'}`,

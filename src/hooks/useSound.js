@@ -50,6 +50,7 @@ export function useSound(settings) {
   const keepAliveAudioRef = useRef(null)
   const keepAliveUrlRef = useRef(null)
   const scheduledNodesRef = useRef([]) // pre-scheduled tones for locked-screen playback
+  const staircaseTimersRef = useRef([]) // setTimeout IDs for staircase level cues
 
   function getCtx() {
     if (!ctxRef.current) {
@@ -100,15 +101,31 @@ export function useSound(settings) {
     for (const ex of exercises) {
       for (let s = 0; s < ex.sets; s++) {
         for (let r = 0; r < ex.reps; r++) {
-          // Squeeze cue — rising tone
-          const n1 = scheduleOsc(ctx, 220, 440, 0.15, 'sine', t, vol)
-          if (n1) nodes.push(n1)
-          t += ex.holdSeconds
-
-          // Release cue — falling tone
-          const n2 = scheduleOsc(ctx, 440, 220, 0.2, 'sine', t, vol)
-          if (n2) nodes.push(n2)
-          t += ex.restSeconds
+          if (ex.id === 'staircase') {
+            // 3 ascending stepped tones across the hold (E4, A4, C#5)
+            const hStep = ex.holdSeconds / 3
+            ;[330, 440, 554].forEach((hz, i) => {
+              const n = scheduleOsc(ctx, hz, hz, 0.25, 'triangle', t + i * hStep, vol)
+              if (n) nodes.push(n)
+            })
+            t += ex.holdSeconds
+            // 3 descending stepped tones across the rest
+            const rStep = ex.restSeconds / 3
+            ;[554, 440, 330].forEach((hz, i) => {
+              const n = scheduleOsc(ctx, hz, hz, 0.25, 'triangle', t + i * rStep, vol)
+              if (n) nodes.push(n)
+            })
+            t += ex.restSeconds
+          } else {
+            // Squeeze cue — rising sweep
+            const n1 = scheduleOsc(ctx, 220, 440, 0.15, 'sine', t, vol)
+            if (n1) nodes.push(n1)
+            t += ex.holdSeconds
+            // Release cue — falling sweep
+            const n2 = scheduleOsc(ctx, 440, 220, 0.2, 'sine', t, vol)
+            if (n2) nodes.push(n2)
+            t += ex.restSeconds
+          }
         }
       }
     }
@@ -122,11 +139,19 @@ export function useSound(settings) {
     scheduledNodesRef.current = nodes
   }, [settings])
 
+  // Cancel staircase level cue timeouts
+  const cancelStaircaseCues = useCallback(() => {
+    staircaseTimersRef.current.forEach(id => clearTimeout(id))
+    staircaseTimersRef.current = []
+    if (window.speechSynthesis) window.speechSynthesis.cancel()
+  }, [])
+
   // Cancel all pre-scheduled sounds (call on stop/pause)
   const cancelScheduledSounds = useCallback(() => {
     scheduledNodesRef.current.forEach(n => { try { n.stop() } catch {} })
     scheduledNodesRef.current = []
-  }, [])
+    cancelStaircaseCues()
+  }, [cancelStaircaseCues])
 
   // Keep-alive: dual strategy
   // 1. Web Audio silent node — keeps AudioContext alive on Android/Chrome
@@ -219,8 +244,47 @@ export function useSound(settings) {
     playTone(880, 880, 0.05, 'square')
   }, [settings])
 
+  // Staircase squeeze: announce Level 1 → 2 → 3 spread across holdSeconds
+  const playStaircaseSqueeze = useCallback((holdSeconds) => {
+    if (!settings.soundEnabled) return
+    cancelStaircaseCues()
+    const interval = (holdSeconds / 3) * 1000
+    if (settings.soundType === 'voice') {
+      speak('Gentle squeeze')
+      const t2 = setTimeout(() => speak('Medium squeeze'), interval)
+      const t3 = setTimeout(() => speak('Full squeeze'), interval * 2)
+      staircaseTimersRef.current = [t2, t3]
+    } else {
+      // 3 ascending triangle tones: E4, A4, C#5
+      playTone(330, 330, 0.25, 'triangle')
+      const t2 = setTimeout(() => playTone(440, 440, 0.25, 'triangle'), interval)
+      const t3 = setTimeout(() => playTone(554, 554, 0.25, 'triangle'), interval * 2)
+      staircaseTimersRef.current = [t2, t3]
+    }
+  }, [settings, cancelStaircaseCues])
+
+  // Staircase release: announce Level 3 → 2 → 1 spread across restSeconds
+  const playStaircaseRelease = useCallback((restSeconds) => {
+    if (!settings.soundEnabled) return
+    cancelStaircaseCues()
+    const interval = (restSeconds / 3) * 1000
+    if (settings.soundType === 'voice') {
+      speak('Gentle release')
+      const t2 = setTimeout(() => speak('Medium release'), interval)
+      const t3 = setTimeout(() => speak('Full release'), interval * 2)
+      staircaseTimersRef.current = [t2, t3]
+    } else {
+      // 3 descending triangle tones: C#5, A4, E4
+      playTone(554, 554, 0.25, 'triangle')
+      const t2 = setTimeout(() => playTone(440, 440, 0.25, 'triangle'), interval)
+      const t3 = setTimeout(() => playTone(330, 330, 0.25, 'triangle'), interval * 2)
+      staircaseTimersRef.current = [t2, t3]
+    }
+  }, [settings, cancelStaircaseCues])
+
   return {
     playSqueezeSound, playReleaseSound, playCompleteSound, playTick,
+    playStaircaseSqueeze, playStaircaseRelease,
     startKeepAlive, stopKeepAlive,
     scheduleAllSounds, cancelScheduledSounds
   }

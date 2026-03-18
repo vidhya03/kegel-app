@@ -12,7 +12,7 @@ const KEYS = {
 
 const DEFAULT_SETTINGS = {
   soundEnabled: true,
-  soundType: 'tones',
+  soundType: 'voice',
   volume: 0.7,
   vibrationEnabled: true,
   squeezePattern: 'short-short',
@@ -92,13 +92,16 @@ export function useProgress() {
     if (isNewDay) {
       let day = readJSON(KEYS.day, 1)
       let week = readJSON(KEYS.week, 1)
-      day += 1
-      if (day > 7) {
-        day = 1
-        week = Math.min(week + 1, 4) // cap at week 4
+      // Don't auto-advance if already on maintenance
+      if (week !== 'maintenance') {
+        day += 1
+        if (day > 7) {
+          day = 1
+          week = Math.min(week + 1, 12) // cap at week 12; user switches to maintenance manually
+        }
+        writeJSON(KEYS.day, day)
+        writeJSON(KEYS.week, week)
       }
-      writeJSON(KEYS.day, day)
-      writeJSON(KEYS.week, week)
     }
 
     refresh()
@@ -113,9 +116,10 @@ export function useProgress() {
     refresh()
   }, [refresh])
 
-  // Manually set the active week (1–4) — resets day to 1
+  // Manually set the active week (1–12 or 'maintenance') — resets day to 1
   const setWeek = useCallback((week) => {
-    writeJSON(KEYS.week, Math.min(Math.max(week, 1), 4))
+    const value = week === 'maintenance' ? 'maintenance' : Math.min(Math.max(week, 1), 12)
+    writeJSON(KEYS.week, value)
     writeJSON(KEYS.day, 1)
     refresh()
   }, [refresh])

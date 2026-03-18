@@ -1,9 +1,18 @@
 // CompleteScreen — shown after a session finishes with stats and motivational message
 const MESSAGES = {
-  1: 'Great start! Consistency is everything.',
-  2: 'Building strong foundations!',
-  3: "You're getting stronger every day.",
-  4: 'Elite level control incoming!'
+  1:  'Great start! Consistency is everything.',
+  2:  'Building strong foundations!',
+  3:  "You're getting stronger every day.",
+  4:  'Elite level control incoming!',
+  5:  'Strengthening phase — you showed up.',
+  6:  'Elevator control is yours. Precision building.',
+  7:  'More reps, less rest. Stamina is growing.',
+  8:  'Peak strength week. You crushed it.',
+  9:  'One session a day. Maximum impact.',
+  10: 'Endurance push complete. You\'re in rare company.',
+  11: 'Elite control. Very few people get here.',
+  12:           'Week 12 done. You graduated. Incredible work.',
+  maintenance:  'Maintenance done. Gains locked in. See you tomorrow.'
 }
 
 export default function CompleteScreen({ session, onGoHome, onDoAnother }) {

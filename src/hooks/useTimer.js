@@ -48,7 +48,8 @@ export function useTimer({ onPhaseChange, onComplete } = {}) {
     setCurrentSet(set)
     setCurrentExerciseIndex(exerciseIndex)
 
-    if (onPhaseChange) onPhaseChange(newPhase)
+    const ex = stateRef.current.exercises[exerciseIndex]
+    if (onPhaseChange) onPhaseChange(newPhase, ex)
   }, [onPhaseChange])
 
   // Advance to the next step in the sequence
