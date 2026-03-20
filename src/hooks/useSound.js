@@ -282,9 +282,54 @@ export function useSound(settings) {
     }
   }, [settings, cancelStaircaseCues])
 
+  // Route voice cues per exercise type — covers all 7 exercise ids in program.js
+  const playExerciseCue = useCallback((phase, exercise) => {
+    if (!settings.soundEnabled || settings.soundType !== 'voice') return
+    cancelStaircaseCues()
+    const id = exercise?.id
+
+    if (phase === 'squeeze') {
+      switch (id) {
+        case 'staircase':
+          playStaircaseSqueeze(exercise.holdSeconds)
+          break
+        case 'quick_flicks':
+          speak('Flick')
+          break
+        case 'power_hold':
+          speak('Full squeeze')
+          break
+        case 'sustained_squeeze':
+        case 'long_hold':
+          speak('Squeeze and hold')
+          break
+        case 'combo': {
+          speak('Full squeeze')
+          // Cue "Quick flicks" 2 seconds before the hold ends
+          const flickAt = Math.max(500, (exercise.holdSeconds - 2) * 1000)
+          const t = setTimeout(() => speak('Quick flicks'), flickAt)
+          staircaseTimersRef.current = [t]
+          break
+        }
+        default:
+          speak('Squeeze')
+      }
+    } else if (phase === 'release') {
+      switch (id) {
+        case 'staircase':
+          playStaircaseRelease(exercise.restSeconds)
+          break
+        case 'quick_flicks':
+          break // silent — 1s rest, cue would overlap next rep
+        default:
+          speak('Release')
+      }
+    }
+  }, [settings, cancelStaircaseCues, playStaircaseSqueeze, playStaircaseRelease])
+
   return {
     playSqueezeSound, playReleaseSound, playCompleteSound, playTick,
-    playStaircaseSqueeze, playStaircaseRelease,
+    playExerciseCue,
     startKeepAlive, stopKeepAlive,
     scheduleAllSounds, cancelScheduledSounds
   }

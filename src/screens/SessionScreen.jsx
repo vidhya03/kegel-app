@@ -45,21 +45,12 @@ export default function SessionScreen({ onComplete, onStop, settings, progress, 
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePhaseChange = (phase, exercise) => {
+    // Voice cues — exercise-specific phrases for all 7 exercise types
+    sound.playExerciseCue(phase, exercise)
+
     if (phase === 'squeeze') {
-      if (exercise?.id === 'staircase') {
-        // Staircase: speak Level 1/2/3 spread across hold (both voice + tones modes)
-        sound.playStaircaseSqueeze(exercise.holdSeconds)
-      } else if (settings.soundType === 'voice') {
-        // Regular: tones are pre-scheduled — only play here for voice mode
-        sound.playSqueezeSound()
-      }
       vibration.vibrateOnSqueeze()
     } else if (phase === 'release') {
-      if (exercise?.id === 'staircase') {
-        sound.playStaircaseRelease(exercise.restSeconds)
-      } else if (settings.soundType === 'voice') {
-        sound.playReleaseSound()
-      }
       vibration.vibrateOnRelease()
       setTotalReps(r => r + 1)
     }
