@@ -1,47 +1,27 @@
 import { useCallback, useRef, useEffect } from 'react'
+import { createWavBlobUrl } from '../utils/wav'
 
 // Convert AudioBuffer → WAV Blob URL (used for HTMLAudioElement iOS keep-alive)
 function audioBufferToWavUrl(buffer) {
-  const numSamples = buffer.length
-  const sampleRate = buffer.sampleRate
-  const dataLength = numSamples * 2
-  const ab = new ArrayBuffer(44 + dataLength)
-  const view = new DataView(ab)
-  const write = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)) }
-  write(0, 'RIFF'); view.setUint32(4, 36 + dataLength, true)
-  write(8, 'WAVE'); write(12, 'fmt ')
-  view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true)
-  view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true)
-  view.setUint16(32, 2, true); view.setUint16(34, 16, true)
-  write(36, 'data'); view.setUint32(40, dataLength, true)
   const samples = buffer.getChannelData(0)
-  for (let i = 0; i < numSamples; i++) {
-    const s = Math.max(-1, Math.min(1, samples[i]))
-    view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true)
-  }
-  return URL.createObjectURL(new Blob([ab], { type: 'audio/wav' }))
+  return createWavBlobUrl(buffer.sampleRate, buffer.length, (view, numSamples) => {
+    for (let i = 0; i < numSamples; i++) {
+      const s = Math.max(-1, Math.min(1, samples[i]))
+      view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true)
+    }
+  })
 }
 
 // Generate a completely silent looping WAV to keep iOS audio session alive through lock screen
 // iOS only needs audio playback to be active — audible content is not required
 function createKeepAliveWavUrl() {
   try {
-    const sampleRate = 22050
-    const numSamples = sampleRate * 3 // 3s loop of silence
-    const dataLength = numSamples * 2
-    const ab = new ArrayBuffer(44 + dataLength)
-    const view = new DataView(ab)
-    const write = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)) }
-    write(0, 'RIFF'); view.setUint32(4, 36 + dataLength, true)
-    write(8, 'WAVE'); write(12, 'fmt ')
-    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true)
-    view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true)
-    view.setUint16(32, 2, true); view.setUint16(34, 16, true)
-    write(36, 'data'); view.setUint32(40, dataLength, true)
-    // Leave PCM samples as zero — perfectly silent
-    return URL.createObjectURL(new Blob([ab], { type: 'audio/wav' }))
+    // 3s loop of silence — PCM samples left as zero
+    return createWavBlobUrl(22050, 22050 * 3)
   } catch { return null }
 }
+
+const DEFAULT_VOLUME = 0.7
 
 // Web Audio API sound engine — no external audio files needed
 export function useSound(settings) {
@@ -94,7 +74,7 @@ export function useSound(settings) {
     scheduledNodesRef.current.forEach(n => { try { n.stop() } catch {} })
     scheduledNodesRef.current = []
 
-    const vol = settings.volume ?? 0.7
+    const vol = settings.volume ?? DEFAULT_VOLUME
     let t = ctx.currentTime + 0.3 // small startup buffer
     const nodes = []
 
@@ -206,14 +186,14 @@ export function useSound(settings) {
     if (!window.speechSynthesis) return
     window.speechSynthesis.cancel()
     const u = new SpeechSynthesisUtterance(text)
-    u.volume = settings.volume ?? 0.7; u.rate = 0.9
+    u.volume = settings.volume ?? DEFAULT_VOLUME; u.rate = 0.9
     window.speechSynthesis.speak(u)
   }
 
   async function playTone(startHz, endHz, durationSec, type = 'sine') {
     const ctx = getCtx(); if (!ctx) return
     await resumeCtx(ctx)
-    scheduleOsc(ctx, startHz, endHz, durationSec, type, ctx.currentTime, settings.volume ?? 0.7)
+    scheduleOsc(ctx, startHz, endHz, durationSec, type, ctx.currentTime, settings.volume ?? DEFAULT_VOLUME)
   }
 
   // These are used only in voice mode and for immediate feedback (foreground only)
@@ -235,7 +215,7 @@ export function useSound(settings) {
     const ctx = getCtx(); if (!ctx) return
     await resumeCtx(ctx)
     ;[261.63, 329.63, 392.0].forEach((freq, i) => {
-      scheduleOsc(ctx, freq, freq, 0.3, 'sine', ctx.currentTime + i * 0.18, settings.volume ?? 0.7)
+      scheduleOsc(ctx, freq, freq, 0.3, 'sine', ctx.currentTime + i * 0.18, settings.volume ?? DEFAULT_VOLUME)
     })
   }, [settings])
 

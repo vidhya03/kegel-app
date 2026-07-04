@@ -167,7 +167,7 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
 
       {/* Exercise rows with inline play buttons */}
       <div style={{ marginBottom: '1.25rem' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--cds-text-secondary)', marginBottom: '0.5rem' }}>
+        <div className="section-title">
           Choose Exercise
         </div>
 

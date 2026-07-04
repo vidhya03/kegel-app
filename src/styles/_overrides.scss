@@ -197,6 +197,17 @@
   }
 }
 
+// Standalone section title — same style as settings-section__title
+// for use outside .settings-section (HomeScreen, FeedbackScreen)
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cds-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
 // Pattern selector buttons
 .pattern-selector {
   display: flex;

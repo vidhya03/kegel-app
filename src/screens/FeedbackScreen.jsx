@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FORM_INPUT_STYLE, SOCIAL_LINK_STYLE } from '../utils/styles'
 
 function encode(data) {
   return Object.keys(data)
@@ -85,18 +86,7 @@ export default function FeedbackScreen() {
               onChange={handleChange}
               placeholder="Your name"
               required
-              style={{
-                width: '100%',
-                background: 'var(--cds-layer-02)',
-                border: '1px solid var(--cds-border-subtle-01)',
-                borderBottom: '1px solid var(--cds-text-secondary)',
-                color: 'var(--cds-text-primary)',
-                padding: '0.625rem 0.75rem',
-                fontSize: '0.9375rem',
-                outline: 'none',
-                boxSizing: 'border-box',
-                fontFamily: 'inherit'
-              }}
+              style={FORM_INPUT_STYLE}
             />
           </p>
 
@@ -111,18 +101,7 @@ export default function FeedbackScreen() {
               onChange={handleChange}
               placeholder="your@email.com"
               required
-              style={{
-                width: '100%',
-                background: 'var(--cds-layer-02)',
-                border: '1px solid var(--cds-border-subtle-01)',
-                borderBottom: '1px solid var(--cds-text-secondary)',
-                color: 'var(--cds-text-primary)',
-                padding: '0.625rem 0.75rem',
-                fontSize: '0.9375rem',
-                outline: 'none',
-                boxSizing: 'border-box',
-                fontFamily: 'inherit'
-              }}
+              style={FORM_INPUT_STYLE}
             />
           </p>
 
@@ -139,20 +118,7 @@ export default function FeedbackScreen() {
               placeholder="Bug report, feature idea, or general feedback..."
               required
               rows={4}
-              style={{
-                width: '100%',
-                background: 'var(--cds-layer-02)',
-                border: '1px solid var(--cds-border-subtle-01)',
-                borderBottom: '1px solid var(--cds-text-secondary)',
-                color: 'var(--cds-text-primary)',
-                padding: '0.625rem 0.75rem',
-                fontSize: '0.9375rem',
-                outline: 'none',
-                boxSizing: 'border-box',
-                fontFamily: 'inherit',
-                resize: 'vertical',
-                minHeight: '100px'
-              }}
+              style={{ ...FORM_INPUT_STYLE, resize: 'vertical', minHeight: '100px' }}
             />
           </p>
 
@@ -177,7 +143,7 @@ export default function FeedbackScreen() {
 
       {/* Social links */}
       <div style={{ borderTop: '1px solid var(--cds-border-subtle-01)', paddingTop: '1.25rem' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--cds-text-secondary)', marginBottom: '0.75rem' }}>
+        <div className="section-title" style={{ marginBottom: '0.75rem' }}>
           Connect
         </div>
 
@@ -187,14 +153,7 @@ export default function FeedbackScreen() {
             href="https://instagram.com/03vidhya"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              display: 'flex', alignItems: 'center', gap: '0.875rem',
-              background: 'var(--cds-layer-01)',
-              border: '1px solid var(--cds-border-subtle-01)',
-              padding: '0.75rem 1rem',
-              textDecoration: 'none',
-              color: 'var(--cds-text-primary)'
-            }}
+            style={SOCIAL_LINK_STYLE}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E1306C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -212,14 +171,7 @@ export default function FeedbackScreen() {
             href="https://www.linkedin.com/in/vidhyadharan/"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              display: 'flex', alignItems: 'center', gap: '0.875rem',
-              background: 'var(--cds-layer-01)',
-              border: '1px solid var(--cds-border-subtle-01)',
-              padding: '0.75rem 1rem',
-              textDecoration: 'none',
-              color: 'var(--cds-text-primary)'
-            }}
+            style={SOCIAL_LINK_STYLE}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#0A66C2">
               <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/>
