@@ -25,13 +25,37 @@ function readJSON(key, fallback) {
   try {
     const raw = localStorage.getItem(key)
     return raw ? JSON.parse(raw) : fallback
-  } catch {
+  } catch (err) {
+    // Corrupt/unreadable value — fall back, but surface it so it isn't
+    // swallowed silently and can be diagnosed.
+    console.warn(`useProgress: failed to read/parse localStorage key "${key}"`, err)
     return fallback
   }
 }
 
+// Read a raw string value, guarding against localStorage access throwing
+// (disabled storage / private mode) — which would otherwise crash callers
+// that run during render.
+function readString(key, fallback = null) {
+  try {
+    return localStorage.getItem(key) ?? fallback
+  } catch (err) {
+    console.warn(`useProgress: failed to read localStorage key "${key}"`, err)
+    return fallback
+  }
+}
+
+// Persist a value to localStorage. localStorage can throw (quota exceeded,
+// disabled storage, Safari private mode) — catch and report instead of letting
+// it bubble up and crash the calling React handler. Returns true on success.
 function writeJSON(key, value) {
-  localStorage.setItem(key, JSON.stringify(value))
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+    return true
+  } catch (err) {
+    console.error(`useProgress: failed to write localStorage key "${key}"`, err)
+    return false
+  }
 }
 
 // Check if a date string is today
@@ -62,7 +86,7 @@ export function useProgress() {
       day: readJSON(KEYS.day, 1),
       sessions: readJSON(KEYS.sessions, []),
       streak: readJSON(KEYS.streak, 0),
-      lastSession: localStorage.getItem(KEYS.lastSession) || null
+      lastSession: readString(KEYS.lastSession)
     }
   }, [])
 
@@ -72,7 +96,7 @@ export function useProgress() {
     writeJSON(KEYS.sessions, sessions)
 
     // Read lastSession BEFORE updating it — used for streak + day progression
-    const lastSession = localStorage.getItem(KEYS.lastSession)
+    const lastSession = readString(KEYS.lastSession)
     const isNewDay = !isToday(lastSession)
 
     // Update streak
@@ -86,7 +110,11 @@ export function useProgress() {
       streak = 1
     }
     writeJSON(KEYS.streak, streak)
-    localStorage.setItem(KEYS.lastSession, new Date().toISOString())
+    try {
+      localStorage.setItem(KEYS.lastSession, new Date().toISOString())
+    } catch (err) {
+      console.error(`useProgress: failed to write localStorage key "${KEYS.lastSession}"`, err)
+    }
 
     // Auto-advance program day/week on first session of a new calendar day
     if (isNewDay) {
@@ -125,7 +153,11 @@ export function useProgress() {
   }, [refresh])
 
   const resetProgress = useCallback(() => {
-    Object.values(KEYS).forEach(k => localStorage.removeItem(k))
+    try {
+      Object.values(KEYS).forEach(k => localStorage.removeItem(k))
+    } catch (err) {
+      console.error('useProgress: failed to clear progress from localStorage', err)
+    }
     refresh()
   }, [refresh])
 

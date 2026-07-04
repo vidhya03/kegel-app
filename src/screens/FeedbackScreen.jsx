@@ -17,14 +17,19 @@ export default function FeedbackScreen() {
     e.preventDefault()
     setStatus('sending')
     try {
-      await fetch('/', {
+      const res = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: encode({ 'form-name': 'feedback', ...form })
       })
+      // fetch only rejects on network failure — a non-2xx HTTP response
+      // (e.g. Netlify Forms rejecting the submission) still resolves, so
+      // check the status explicitly instead of assuming success.
+      if (!res.ok) throw new Error(`Feedback submission failed: ${res.status} ${res.statusText}`)
       setStatus('sent')
       setForm({ name: '', email: '', role: '', message: '' })
-    } catch {
+    } catch (err) {
+      console.error('Feedback submission failed', err)
       setStatus('error')
     }
   }

@@ -40,7 +40,10 @@ function createKeepAliveWavUrl() {
     write(36, 'data'); view.setUint32(40, dataLength, true)
     // Leave PCM samples as zero — perfectly silent
     return URL.createObjectURL(new Blob([ab], { type: 'audio/wav' }))
-  } catch { return null }
+  } catch (err) {
+    console.warn('useSound: failed to build keep-alive WAV', err)
+    return null
+  }
 }
 
 // Web Audio API sound engine — no external audio files needed
@@ -54,13 +57,24 @@ export function useSound(settings) {
 
   function getCtx() {
     if (!ctxRef.current) {
-      try { ctxRef.current = new (window.AudioContext || window.webkitAudioContext)() } catch { return null }
+      try {
+        ctxRef.current = new (window.AudioContext || window.webkitAudioContext)()
+      } catch (err) {
+        console.warn('useSound: AudioContext is unavailable', err)
+        return null
+      }
     }
     return ctxRef.current
   }
 
   async function resumeCtx(ctx) {
-    if (ctx.state === 'suspended') { try { await ctx.resume() } catch {} }
+    if (ctx.state === 'suspended') {
+      try {
+        await ctx.resume()
+      } catch (err) {
+        console.warn('useSound: failed to resume AudioContext', err)
+      }
+    }
   }
 
   // Schedule a single oscillator at an absolute AudioContext time
@@ -168,7 +182,9 @@ export function useSound(settings) {
         source.connect(gain); gain.connect(ctx.destination)
         source.start()
         keepAliveNodeRef.current = source
-      } catch {}
+      } catch (err) {
+        console.warn('useSound: failed to start Web Audio keep-alive node', err)
+      }
     }
 
     if (!keepAliveAudioRef.current) {
@@ -178,7 +194,11 @@ export function useSound(settings) {
         const audio = new Audio(url)
         audio.loop = true
         audio.volume = 1.0 // volume is irrelevant — WAV is silent PCM zeros
-        try { await audio.play() } catch {}
+        try {
+          await audio.play()
+        } catch (err) {
+          console.warn('useSound: keep-alive audio playback was blocked', err)
+        }
         keepAliveAudioRef.current = audio
       }
     }

@@ -6,6 +6,18 @@ import { useSound } from '../hooks/useSound'
 import { useVibration } from '../hooks/useVibration'
 import { PROGRAM } from '../data/program'
 
+// crypto.randomUUID is only available in secure contexts (HTTPS/localhost).
+// Fall back to a timestamp-based id so completing a session never throws and
+// loses the user's just-finished progress.
+function makeSessionId() {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  } catch (err) {
+    console.warn('SessionScreen: crypto.randomUUID() unavailable, using fallback id', err)
+  }
+  return `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
 // SessionScreen — real-time timer with squeeze/release phases
 // exercises prop: specific selection from HomeScreen, falls back to full week program
 export default function SessionScreen({ onComplete, onStop, settings, progress, exercises: exercisesProp }) {
@@ -28,7 +40,7 @@ export default function SessionScreen({ onComplete, onStop, settings, progress, 
       await sound.startKeepAlive()
       sound.scheduleAllSounds(exercises)
     }
-    init()
+    init().catch(err => console.warn('SessionScreen: audio init failed', err))
 
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -64,7 +76,7 @@ export default function SessionScreen({ onComplete, onStop, settings, progress, 
     const allReps = ex.reduce((sum, e) => sum + e.sets * e.reps, 0)
 
     onComplete({
-      id: crypto.randomUUID(),
+      id: makeSessionId(),
       date: new Date().toISOString(),
       week: progress.week,
       day: progress.day,
