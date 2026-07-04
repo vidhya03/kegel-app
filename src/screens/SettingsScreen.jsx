@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSound } from '../hooks/useSound'
 import { useVibration } from '../hooks/useVibration'
 import { useReminders } from '../hooks/useReminders'
+import SettingsToggle from '../components/SettingsToggle'
 
 // SettingsScreen — sound, vibration, reminders, and progress reset controls
 export default function SettingsScreen({ settings, onSave, onResetProgress }) {
@@ -47,15 +48,7 @@ export default function SettingsScreen({ settings, onSave, onResetProgress }) {
       <div className="settings-section">
         <div className="settings-section__title">Sound</div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <span style={{ color: 'var(--cds-text-primary)' }}>Sound</span>
-          <button
-            className={`cds--btn cds--btn--sm ${local.soundEnabled ? 'cds--btn--primary' : 'cds--btn--secondary'}`}
-            onClick={() => update('soundEnabled', !local.soundEnabled)}
-          >
-            {local.soundEnabled ? 'ON' : 'OFF'}
-          </button>
-        </div>
+        <SettingsToggle label="Sound" enabled={local.soundEnabled} onToggle={() => update('soundEnabled', !local.soundEnabled)} />
 
         {local.soundEnabled && (
           <>
@@ -118,15 +111,7 @@ export default function SettingsScreen({ settings, onSave, onResetProgress }) {
           </div>
         ) : (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <span style={{ color: 'var(--cds-text-primary)' }}>Vibration</span>
-              <button
-                className={`cds--btn cds--btn--sm ${local.vibrationEnabled ? 'cds--btn--primary' : 'cds--btn--secondary'}`}
-                onClick={() => update('vibrationEnabled', !local.vibrationEnabled)}
-              >
-                {local.vibrationEnabled ? 'ON' : 'OFF'}
-              </button>
-            </div>
+            <SettingsToggle label="Vibration" enabled={local.vibrationEnabled} onToggle={() => update('vibrationEnabled', !local.vibrationEnabled)} />
 
             {local.vibrationEnabled && (
               <>
@@ -232,15 +217,7 @@ export default function SettingsScreen({ settings, onSave, onResetProgress }) {
 
             {reminders.permission === 'granted' && (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                  <span style={{ color: 'var(--cds-text-primary)' }}>Daily Reminder</span>
-                  <button
-                    className={`cds--btn cds--btn--sm ${local.reminderEnabled ? 'cds--btn--primary' : 'cds--btn--secondary'}`}
-                    onClick={() => update('reminderEnabled', !local.reminderEnabled)}
-                  >
-                    {local.reminderEnabled ? 'ON' : 'OFF'}
-                  </button>
-                </div>
+                <SettingsToggle label="Daily Reminder" enabled={local.reminderEnabled} onToggle={() => update('reminderEnabled', !local.reminderEnabled)} />
 
                 {local.reminderEnabled && (
                   <div style={{ marginBottom: '1rem' }}>
