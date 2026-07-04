@@ -12,13 +12,22 @@ function getPermission() {
 }
 
 function didFireToday() {
-  const last = localStorage.getItem(REMINDER_FIRED_KEY)
-  if (!last) return false
-  return new Date(last).toDateString() === new Date().toDateString()
+  try {
+    const last = localStorage.getItem(REMINDER_FIRED_KEY)
+    if (!last) return false
+    return new Date(last).toDateString() === new Date().toDateString()
+  } catch (err) {
+    console.warn('useReminders: failed to read reminder-fired flag', err)
+    return false
+  }
 }
 
 function markFiredToday() {
-  localStorage.setItem(REMINDER_FIRED_KEY, new Date().toISOString())
+  try {
+    localStorage.setItem(REMINDER_FIRED_KEY, new Date().toISOString())
+  } catch (err) {
+    console.warn('useReminders: failed to persist reminder-fired flag', err)
+  }
 }
 
 function fireNotification() {
@@ -29,8 +38,8 @@ function fireNotification() {
       tag: 'kc-daily-reminder'
     })
     markFiredToday()
-  } catch {
-    // silently fail if blocked
+  } catch (err) {
+    console.warn('useReminders: failed to show daily reminder notification', err)
   }
 }
 
@@ -40,9 +49,18 @@ export function useReminders(settings) {
 
   const requestPermission = useCallback(async () => {
     if (!('Notification' in window)) return 'unsupported'
-    const result = await Notification.requestPermission()
-    setPermission(result)
-    return result
+    try {
+      const result = await Notification.requestPermission()
+      setPermission(result)
+      return result
+    } catch (err) {
+      // Some browsers reject requestPermission() (e.g. called outside a user
+      // gesture) — report it and reflect the current permission state.
+      console.warn('useReminders: Notification.requestPermission() failed', err)
+      const current = getPermission()
+      setPermission(current)
+      return current
+    }
   }, [])
 
   // Check every minute if the reminder time has been reached
@@ -72,8 +90,8 @@ export function useReminders(settings) {
         icon: '/favicon.svg',
         tag: 'kc-test'
       })
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.warn('useReminders: failed to show test notification', err)
     }
   }, [permission, settings?.reminderTime])
 

@@ -22,8 +22,8 @@ function vibrate(pattern) {
   if (!pattern) return
   try {
     navigator.vibrate(pattern)
-  } catch {
-    // silently fail
+  } catch (err) {
+    console.warn('useVibration: navigator.vibrate() failed', err)
   }
 }
 

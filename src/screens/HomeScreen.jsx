@@ -82,12 +82,27 @@ export default function HomeScreen({ onStart, onSetWeek, progress, todaySessions
   const alreadyDoneTarget = doneToday >= sessionsPerDay
   const activeWeekMeta = WEEKS.find(w => w.week === week)
 
-  // Auto-show for first-time users (no sessions yet and haven't seen it)
-  const isFirstTime = !progress.sessions?.length && !localStorage.getItem('kc_seen_howto')
+  // Auto-show for first-time users (no sessions yet and haven't seen it).
+  // localStorage access can throw (disabled storage / private mode) during
+  // render, so read it defensively to avoid crashing the screen.
+  const hasSeenHowTo = (() => {
+    try {
+      return !!localStorage.getItem('kc_seen_howto')
+    } catch (err) {
+      console.warn('HomeScreen: failed to read kc_seen_howto flag', err)
+      return false
+    }
+  })()
+  const isFirstTime = !progress.sessions?.length && !hasSeenHowTo
   const [showHowTo, setShowHowTo] = useState(isFirstTime)
 
   const handleCloseHowTo = () => {
-    localStorage.setItem('kc_seen_howto', '1')
+    try {
+      localStorage.setItem('kc_seen_howto', '1')
+    } catch (err) {
+      // Non-critical (e.g. storage disabled) — still close the modal.
+      console.warn('HomeScreen: failed to persist kc_seen_howto flag', err)
+    }
     setShowHowTo(false)
   }
 
